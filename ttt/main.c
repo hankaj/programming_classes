@@ -90,11 +90,13 @@ int ruchy(char pl[3][3], int glebokosc, int *k, int *m){
                 pl[i][j] = 'x';
                 war=ruchy(pl, glebokosc-1, ws1, ws2);
                 pl[i][j] = ' ';
+                if (war>wmax) {wmax=war; *k=i; *m=j;}
             }
-            if (war>=wmax) {wmax=war; *k=i; *m=j;}
         }
     }
-    return wmax; }
+    if (wmax>-1000000000) return wmax;
+    return oc;
+    }
     else {
         for (i = 0; i < 3; i++) {
             for (j = 0; j < 3; j++) {
@@ -102,23 +104,34 @@ int ruchy(char pl[3][3], int glebokosc, int *k, int *m){
                     pl[i][j] = 'o';
                     war = ruchy(pl, glebokosc - 1, ws1, ws2);
                     pl[i][j] = ' ';
+                    if (war < wmin) {wmin = war;}
                 }
-                if (war <= wmin) {
-                    wmin = war;
-                }
+
             }
         }
-        return wmin;
+        if (wmin<1000000000) return wmin;
+        return oc;
     }
 }
 
 int main() {
-    char pl[3][3]={" xx"," o ","o  "};
-    int i, j;
+    char pl[3][3]={"   ","   ","   "};
+    int i, j, x, y, counter=5;
     int *k = &i;
     int *m = &j;
-    ruchy(pl, 4, k, m);
-    pl[i][j]='x';
-    wypisz(pl);
+    while(counter) {
+        ruchy(pl, 10, k, m);
+        printf("Ruch komputera:\n");
+        pl[i][j]='x';
+        wypisz(pl);
+        if (ocena(pl)==WYGRANA) {printf("Komputer wygrał\n"); break;}
+        if (counter==1) {printf("Remis"); break;}
+        printf("Podaj ruch\n");
+        scanf("%d %d", &x, &y);
+        pl[x][y] = 'o';
+        wypisz(pl);
+        if (ocena(pl)==PRZEGRANA) {printf("Wygrałeś!\n"); break;}
+        counter--;
+    }
     return 0;
 }
