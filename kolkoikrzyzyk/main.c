@@ -32,13 +32,13 @@ int ocena(char pl[10][10]){
             else {wyst[licznik2]--; licznik2=0;}
 //
 //            //kolumny
-//            if (pl[j][i]=='x') licznik3++;
-//            else {wyst[licznik3]++; licznik3=0;}
-//
-//            if (pl[j][i]=='o') licznik4++;
-//            else {wyst[licznik4]--; licznik=0;}
+            if (pl[j][i]=='x') licznik3++;
+            else {wyst[licznik3]++; licznik3=0;}
 
-            if (j==9) {wyst[licznik2]--, wyst[licznik]++;} //wyst[licznik3]++; wyst[licznik4]--;}
+            if (pl[j][i]=='o') licznik4++;
+            else {wyst[licznik4]--; licznik4=0;}
+
+            if (j==9) {wyst[licznik2]--; wyst[licznik]++; wyst[licznik3]++; wyst[licznik4]--;}
         }
     }
 //     // po kolumnach
