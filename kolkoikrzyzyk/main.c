@@ -38,72 +38,62 @@ int ocena(char pl[10][10]){
             if (pl[j][i]=='o') licznik4++;
             else {wyst[licznik4]--; licznik4=0;}
 
-            if (j==9) {wyst[licznik2]--; wyst[licznik]++; wyst[licznik3]++; wyst[licznik4]--;}
+            if (j==9) {wyst[licznik]++; wyst[licznik2]--; wyst[licznik3]++; wyst[licznik4]--;}
         }
     }
-//     // po kolumnach
-//     for (i=0; i<10; i++){
-//         licznik=0;
-//         for (j=0; j<10; j++){
-//             if (pl[j][i]=='x') licznik++;
-//             else {wyst[licznik]++; licznik=0;}
-//             if (j==9) wyst[licznik]++;
-//         }
-//     }
-    //po rzędach kółka
-//    for (i=0; i<10; i++){
-//        licznik=0;
-//        for (j=0; j<10; j++){
-//            if (pl[i][j]=='o') licznik++;
-//            else {wyst[licznik]--; licznik=0;}
-//            if (j==9) wyst[licznik]--;
-//        }
-//    }
-//     // po kolumnach kółka
-//     for (i=0; i<10; i++){
-//         licznik=0;
-//         for (j=0; j<10; j++){
-//             if (pl[j][i]=='o') licznik++;
-//             else {wyst[licznik]--; licznik=0;}
-//             if (j==9) wyst[licznik]--;
-//         }
-//     }
-//     // po skosie prawy górny
-//     for (i=0; i<9; i++){
-//         licznik=0;
-//         for (j=0; j<(10-i); j++){
-//             if (pl[j][j+i]=='x') licznik++;
-//             else {wyst[licznik]++; licznik=0;}
-//             if (j==(10-i-1)) wyst[licznik]++;
-//         }
-//     }
-//     // po skosie lewy dolny
-//     for (i=1; i<9; i++){
-//         licznik=0;
-//         for (j=0; j<(10-i); j++){
-//             if (pl[j+i][j]=='x') licznik++;
-//             else {wyst[licznik]++; licznik=0;}
-//             if (j==(10-i-1)) wyst[licznik]++;
-//         }
-//     }
-//     // po skosie lewy górny
-//     for (i=0; i<9; i++){
-//         licznik=0;
-//         for (j=0; j<(10-i); j++){
-//             if (pl[j][9-i-j]=='x') licznik++;
-//             else {wyst[licznik]++; licznik=0;}
-//             if (j==(10-i-1)) wyst[licznik]++;
-//         }
-//     }
-//     // po skosie prawy dolny
-//     for (i=0; i<8; i++){
-//         licznik=0;
-//         for (j=(1+i); j<10; j++){
-//             if (pl[j][10-j+i]=='x') licznik++;
-//             else {wyst[licznik]++; licznik=0;}
-//             if (j==9) wyst[licznik]++;
-//         }
-//     }
+
+     for (i=0; i<6; i++){
+         licznik=0;
+         licznik2=0;
+         licznik3=0;
+         licznik4=0;
+         for (j=0; j<(10-i); j++){
+             // po skosie prawy górny
+             if (pl[j][j+i]=='x') licznik++;
+             else {wyst[licznik]++; licznik=0;}
+
+             if (pl[j][j+i]=='o') licznik2++;
+             else {wyst[licznik2]--; licznik2=0;}
+
+             // po skosie lewy dolny
+             if (pl[j+i][j]=='x' && i!=0) licznik3++;
+             else {wyst[licznik3]++; licznik3=0;}
+
+             if (pl[j+i][j]=='o' && i!=0) licznik4++;
+             else {wyst[licznik4]--; licznik4=0;}
+
+             if (j==(10-i-1)) {wyst[licznik]++; wyst[licznik2]--; wyst[licznik3]++; wyst[licznik4]--;}
+         }
+     }
+
+     // po skosie lewy górny
+     for (i=4; i<10; i++){
+         licznik=0;
+         licznik2=0;
+         for (j=0; j<=i; j++){
+             if (pl[i-j][j]=='x') licznik++;
+             else {wyst[licznik]++; licznik=0;}
+
+             if (pl[i-j][j]=='o') licznik2++;
+             else {wyst[licznik2]--; licznik2=0;}
+
+             if (j==i) {wyst[licznik]++; wyst[licznik2]--;}
+         }
+     }
+     // po skosie prawy dolny
+     for (i=0; i<5; i++){
+         licznik=0;
+         licznik2=0;
+         for (j=(1+i); j<10; j++){
+             if (pl[j][10-j+i]=='x') licznik++;
+             else {wyst[licznik]++; licznik=0;}
+
+             if (pl[j][10-j+i]=='o') licznik2++;
+             else {wyst[licznik2]--; licznik2=0;}
+
+             if (j==9) {wyst[licznik]++; wyst[licznik2]--;}
+         }
+     }
 //     // po skosie prawy górny kółka
 //     for (i=0; i<9; i++){
 //         licznik=0;
@@ -197,7 +187,7 @@ int main() {
 //    ruchy(pl, 4, k, m);
 //    pl[i][j]='x';
 //    wypisz(pl);
-//    if (ocena(pl)==WYGRANA) {printf("Komputer wygrał\n");}
+////    if (ocena(pl)==WYGRANA) {printf("Komputer wygrał\n");}
 //    wypisz(pl);
 //    printf("%d\n", ocena(pl));
 
