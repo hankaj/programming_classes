@@ -39,6 +39,162 @@ int ocena(int pl[8][8]){
     return wynik;
 }
 
+int ocena_z_heurystykami(int pl[8][8]) {
+    int i, j, wynik=0;
+    int heurytyki[13][8][8] = {
+            // król
+            {
+                    {PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA, PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA},
+                    {PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA, PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA},
+                    {PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA, PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA},
+                    {PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA, PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA},
+                    {PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA, PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA},
+                    {PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA, PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA},
+                    {PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA, PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA},
+                    {PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA, PRZEGRANA, PRZEGRANA, PRZEGRANA,PRZEGRANA},
+            },
+            // hetman
+            {
+                    {-176, -178, -178, -179, -179, -178, -178, -176},
+                    {-178, -180, -180, -180, -180, -180, -180, -178},
+                    {-178, -180, -181, -181, -181, -181, -180, -178},
+                    {-179, -180, -181, -181, -181, -181, -180, -179},
+                    {-180, -180, -181, -181, -181, -181, -180, -179},
+                    {-178, -181, -181, -181, -181, -181, -180, -178},
+                    {-178, -180, -181, -180, -180, -180, -180, -178},
+                    {-176, -178, -178, -179, -179, -178, -178, -176},
+            },
+            // wieża
+            {       {-100, -100, -100, -100, -100, -100, -100, -100},
+                    {-101, -102, -102, -102, -102, -102, -102, -101},
+                    {-99, -100, -100, -100, -100, -100, -100, -99},
+                    {-99, -100, -100, -100, -100, -100, -100, -99},
+                    {-99, -100, -100, -100, -100, -100, -100, -99},
+                    {-99, -100, -100, -100, -100, -100, -100, -99},
+                    {-99, -100, -100, -100, -100, -100, -100, -99},
+                    {-100, -100, 100, -101, -101, -100, -100, -100},
+            },
+            // goniec
+            {
+                    {-56, -58, -58, -58, -58, -58, -58, -56},
+                    {-58, -60, -60, -60, -60, -60, -60, -58},
+                    {-58, -60, -61, -62, -62, -61, -60, -58},
+                    {-58, -61, -61, -62, -62, -61, -61, -58},
+                    {-58, -60, -62, -62, -62, -62, -60, -58},
+                    {-58, -62, -62, -62, -62, -62, -62, -58},
+                    {-58, -61, -60, -60, -60, -60, -61, -58},
+                    {-56, -58, -58, -58, -58, -58, -58, -56},
+            },
+            // skoczek
+            {
+                    {-50, -52, -54, -54, -54, -54, -52, -50},
+                    {-52, -56, -60, -60, -60, -60, -56, -52},
+                    {-54, -60, -62, -63, -63, -62, -60, -54},
+                    {-54, -61, -63, -64, -64, -63, -61, -54},
+                    {-54, -60, -63, -64, -64, -63, -60, -54},
+                    {-54, -61, -62, -63, -63, -62, -61, -54},
+                    {-52, -56, -60, -61, -61, -60, -56, -52},
+                    {-50, -52, -54, -54, -54, -54, -52, -50},
+            },
+            // pionek
+            {
+                    {-20, -20, -20, -20, -20, -20, -20, -20},
+                    {-30, -30, -30, -30, -30, -30, -30, -30},
+                    {-22, -22, -24, -26, -26, -24, -22, -22},
+                    {-21, -21, -22, -25, -25, -22, -21, -21},
+                    {-20, -20, -20, -24, -24, -20, -20, -20},
+                    {-21, -19, -18, -20, -20, -18, -19, -21},
+                    {-21, -22, -22, -16, -16, -22, -22, -21},
+                    {-20, -20, -20, -20, -20, -20, -20, -20},
+            },
+            // król komputera
+            {
+                    {WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA},
+                    {WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA},
+                    {WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA},
+                    {WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA},
+                    {WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA},
+                    {WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA},
+                    {WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA},
+                    {WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA, WYGRANA}
+            },
+            // hetman komputera
+            {
+                    {176, 178, 178, 179, 179, 178, 178, 176},
+                    {178, 180, 180, 180, 180, 180, 180, 178},
+                    {178, 180, 181, 181, 181, 181, 180, 178},
+                    {179, 180, 181, 181, 181, 181, 180, 179},
+                    {180, 180, 181, 181, 181, 181, 180, 179},
+                    {178, 181, 181, 181, 181, 181, 180, 178},
+                    {178, 180, 181, 180, 180, 180, 180, 178},
+                    {176, 178, 178, 179, 179, 178, 178, 176},
+            },
+            // wieża komputera
+            {       {100, 100, 100, 101, 101, 100, 100, 100},
+                    {99, 100, 100, 100, 100, 100, 100, 99},
+                    {99, 100, 100, 100, 100, 100, 100, 99},
+                    {99, 100, 100, 100, 100, 100, 100, 99},
+                    {99, 100, 100, 100, 100, 100, 100, 99},
+                    {99, 100, 100, 100, 100, 100, 100, 99},
+                    {101, 102, 102, 102, 102, 102, 102, 101},
+                    {100, 100, 100, 100, 100, 100, 100, 100},
+            },
+            // goniec komputera
+            {
+                    {56, 58, 58, 58, 58, 58, 58, 56},
+                    {58, 61, 60, 60, 60, 60, 61, 58},
+                    {58, 62, 62, 62, 62, 62, 62, 58},
+                    {58, 60, 62, 62, 62, 62, 60, 58},
+                    {58, 61, 61, 62, 62, 61, 61, 58},
+                    {58, 60, 61, 62, 62, 61, 60, 58},
+                    {58, 60, 60, 60, 60, 60, 60, 58},
+                    {56, 58, 58, 58, 58, 58, 58, 56},
+            },
+            // skoczek komputera
+            {
+                    {50, 52, 54, 54, 54, 54, 52, 50},
+                    {52, 56, 60, 60, 60, 60, 56, 52},
+                    {54, 60, 62, 63, 63, 62, 60, 54},
+                    {54, 61, 63, 64, 64, 63, 61, 54},
+                    {54, 60, 63, 64, 64, 63, 60, 54},
+                    {54, 61, 62, 63, 63, 62, 61, 54},
+                    {52, 56, 60, 61, 61, 60, 56, 52},
+                    {50, 52, 54, 54, 54, 54, 52, 50},
+            },
+            // pionek komputera
+            {
+                {20, 20, 20, 20, 20, 20, 20, 20},
+                {21, 22, 22, 16, 16, 22, 22, 21},
+                {21, 19, 18, 20, 20, 18, 19, 21},
+                {20, 20, 20, 24, 24, 20, 20, 20},
+                {21, 21, 22, 25, 25, 22, 21, 21},
+                {22, 22, 24, 26, 26, 24, 22, 22},
+                {30, 30, 30, 30, 30, 30, 30, 30},
+                {20, 20, 20, 20, 20, 20, 20, 20}
+            },
+            // puste
+            {
+                    {0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0},
+            }
+
+    };
+
+    for (i=0;i<8;i++){
+        for (j=0;j<8;j++){
+            wynik+=heurytyki[pl[i][j]][i][j];
+        }
+    }
+    //printf("%d", wynik);
+    return wynik;
+}
+
 int ilosc_ruchow[]={8,8,4,4,8,3,8,8,4,4,8,3,0};
 int dlugosc_ruchu[]={2,8,8,8,2,2,2,8,8,8,2,2,0};
 
@@ -135,7 +291,7 @@ int wykonaj_ruch(int pl[8][8], int gl, int *x, int *y, int *k, int *o){
     int px_pom, py_pom, k_pom, o_pom, px, py, dx, dy, kierunek, odleglosc;
     int wynik, wmax, wmin, ruszana_fig, bita_fig, figura;
 
-    wynik=ocena(pl);
+    wynik=ocena_z_heurystykami(pl);
 
     if (gl==0 || 2*wynik>WYGRANA || 2*wynik<PRZEGRANA) return wynik;
 
@@ -259,7 +415,7 @@ int main() {
         wykonaj_ruch(pl, 4, x, y, k, o);
         przesun_figure(pl, x1,y1,kierunkek,odleglosc);
         wypisz_ladnie(pl);
-        if (ocena(pl)*2>WYGRANA) {printf("Komputer wygrał\n"); break;}
+        if (ocena_z_heurystykami(pl)*2>WYGRANA) {printf("Komputer wygrał\n"); break;}
 
         while (1){
         printf("Podaj ruch\n");
@@ -270,6 +426,6 @@ int main() {
 
         przesun_figure_gracza(pl, z_x, z_y, do_x, do_y);
         wypisz_ladnie(pl);
-        if (ocena(pl)*2<PRZEGRANA) {printf("Wygrałeś\n"); break;}
+        if (ocena_z_heurystykami(pl)*2<PRZEGRANA) {printf("Wygrałeś\n"); break;}
     }
 }
