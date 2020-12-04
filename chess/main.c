@@ -1,6 +1,6 @@
 #include <stdio.h>
-#define PRZEGRANA -1000
-#define WYGRANA 1000
+#define PRZEGRANA -10000
+#define WYGRANA 10000
 
 //0-król, 1-hetman, 2-wieża, 3-goniec, 4-skoczek, 5-pionek, 6-król_k, 7-hetman_k, 8-wieża_k, 9-goniec_k, 10-skoczek_k, 11-pionek_k, 12-pole puste
 
@@ -195,9 +195,11 @@ int ocena_z_heurystykami(int pl[8][8]) {
     return wynik;
 }
 
+
 int ilosc_ruchow[]={8,8,4,4,8,3,8,8,4,4,8,3,0};
 int dlugosc_ruchu[]={2,8,8,8,2,2,2,8,8,8,2,2,0};
 
+// przesuwanie na boki
 int wekt_y[12][8]={
         {0,1,1,1,0,-1,-1,-1},
         {0,1,1,1,0,-1,-1,-1},
@@ -213,6 +215,7 @@ int wekt_y[12][8]={
         {-1,0,1}
 };
 
+// przesuwanie góra-dół
 int wekt_x[12][8]={
         {-1,-1,0,1,1,1,0,-1},
         {-1,-1,0,1,1,1,0,-1},
@@ -228,6 +231,7 @@ int wekt_x[12][8]={
         {1,1,1}
 };
 
+// przesuwanie figury komputera
 void przesun_figure(int pl[8][8], int x, int y, int kierunek, int odleglosc){
     int figura, dx, dy;
     figura=pl[x][y];
@@ -289,7 +293,7 @@ int czy_mozna_tak_postawic(int pl[8][8], int z_x, int z_y, int do_x, int do_y){
 
 int wykonaj_ruch(int pl[8][8], int gl, int *x, int *y, int *k, int *o){
     int px_pom, py_pom, k_pom, o_pom, px, py, dx, dy, kierunek, odleglosc;
-    int wynik, wmax, wmin, ruszana_fig, bita_fig, figura;
+    int wynik, wmax, wmin, bita_fig, figura;
 
     wynik=ocena_z_heurystykami(pl);
 
@@ -318,7 +322,7 @@ int wykonaj_ruch(int pl[8][8], int gl, int *x, int *y, int *k, int *o){
                             // sprawdza czy ruch nie wykracza poza planszę
                             if (px+dx>=0 && px+dx<8 && py+dy>=0 && py+dy<8){
                                 bita_fig=pl[px+dx][py+dy];
-                                // sprawdza czy docelowe pole jest puste czy jest tam figura przeciwnika
+                                // sprawdza czy docelowe pole jest puste lub czy jest tam figura przeciwnika
                                 if (bita_fig==12 || bita_fig<=5){
                                     // warunek dla pionka (ruch po skosie z biciem lub ruch do przodu na puste)
                                     if (figura !=11 || (bita_fig==12 && dy==0) || (bita_fig!=12 && dy!=0)){
@@ -416,6 +420,7 @@ int main() {
         przesun_figure(pl, x1,y1,kierunkek,odleglosc);
         wypisz_ladnie(pl);
         if (ocena_z_heurystykami(pl)*2>WYGRANA) {printf("Komputer wygrał\n"); break;}
+        if (ocena_z_heurystykami(pl)*2<PRZEGRANA) {printf("Wygrałeś\n"); break;}
 
         while (1){
         printf("Podaj ruch\n");
@@ -426,6 +431,8 @@ int main() {
 
         przesun_figure_gracza(pl, z_x, z_y, do_x, do_y);
         wypisz_ladnie(pl);
+
         if (ocena_z_heurystykami(pl)*2<PRZEGRANA) {printf("Wygrałeś\n"); break;}
+        if (ocena_z_heurystykami(pl)*2>WYGRANA) {printf("Komputer wygrał\n"); break;}
     }
 }
