@@ -7,14 +7,14 @@ struct el_listy{
 };
 
 void dopisz(struct el_listy **pocz, double war){
-    struct el_listy *nowy, *ww=*pocz;
+    struct el_listy *nowy, *ostatni=*pocz;
     nowy=malloc(sizeof(struct el_listy));
     nowy->w=war;
     nowy->nast=0;
-    if (ww==0) *pocz=nowy;
+    if (ostatni==0) *pocz=nowy;
     else {
-        while (ww->nast) ww=ww->nast;
-        ww->nast=nowy;
+        while (ostatni->nast) ostatni=ostatni->nast;
+        ostatni->nast=nowy;
     }
 }
 
@@ -26,8 +26,10 @@ void wstaw(struct  el_listy **pocz, double war){
     struct el_listy *nowy, *ww=*pocz;
     nowy=malloc(sizeof(struct el_listy));
     nowy->w=war;
-    if (ww==0 || war < ww->w) {nowy->nast = ww; *pocz=nowy;}
+    if (ww==0 || war < ww->w) {nowy->nast = ww; *pocz=nowy;} // nie może być na odwrót, bo gdy ww=0 to nie da się ww->w
     else{
+        // przesuwamy się aż dojdziemy do ostatniego elementu albo wartość następnego elementu będzie większa od war
+        // nie może być na odwrót też
         while (ww->nast!=0 && war > ww->nast->w) ww = ww->nast;
         nowy->nast = ww->nast;
         ww->nast = nowy;
@@ -50,8 +52,9 @@ void usun(struct el_listy **pocz, double war){
 
 
 struct el_listy *znajdz(struct  el_listy *pocz, double war){
-    while (pocz && pocz->w != war && pocz->nast) pocz=pocz->nast;
-    if (pocz->w==war) return pocz;
+    while (pocz && pocz->w != war /* && pocz->nast*/) pocz=pocz->nast;
+    //if (pocz==0) return 0;
+    if (pocz==0 || pocz->w==war) return pocz;
     return 0;
 }
 
@@ -82,13 +85,33 @@ struct el_listy *dodaj_listy(struct el_listy *pocz1, struct el_listy *pocz2){
 
 int main() {
     struct el_listy *w2, *w3, *ws=0, *w4=0;
+    // czy działa dopisz i wypisz
+    ws=malloc(sizeof(struct el_listy));
+    ws->w=2;
+    ws->nast=0;
     dopisz(&ws, 5);
     dopisz(&ws,10);
+    //wypisz(ws);
+    // czy działa wstaw
+    wstaw(&ws, 8);
     wypisz(ws);
-    w2=kopiuj_liste(ws);
-    wstaw(&w2, 8);
-    wypisz(w2);
     printf("\n");
-    w3=dodaj_listy(w2, w4);
+    // czy działa usuń
+    usun(&ws, 10);
+    wypisz(ws);
+    printf("\n");
+    // czy działa znajdź
+    w2 = znajdz(ws, 5);
+    if (w2) w2->w=6;
+    wypisz(ws);
+    printf("\n");
+    // czy działa kopiuj
+    w2=kopiuj_liste(ws);
+    wstaw(&w2, 7);
+    wypisz(w2);
+    printf("dodaj\n");
+
+    // czy działa dodaj
+    w3=dodaj_listy(ws, w2);
     wypisz(w3);
 }
