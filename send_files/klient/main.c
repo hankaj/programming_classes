@@ -20,16 +20,16 @@ int main() {
     if (status<0) {printf("blad connect\n"); return 0;}
 
     while (end) {
-        strcpy(buf, "");
-        strcpy(mess, "");
+        memset(buf,0,strlen(buf));
+        memset(mess,0,strlen(mess));
         printf("Podaj tekst:\n");
         fgets(mess,sizeof(mess), stdin);
         status = send(gniazdo, mess, strlen(mess),0);
         fflush(stdout);
         if (mess[0]=='P' || mess[0]=='Q') end=0;
         status = recv(gniazdo, buf, sizeof(buf)-1,0);
-        buf[status]='\0';
-        printf("Otrzymałem: %s\n",buf);
+        //buf[status]='\0';
+        printf("Otrzymałem:\n%s\n",buf);
     }
 
     close(gniazdo);
