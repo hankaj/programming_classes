@@ -7,6 +7,7 @@ int status,gniazdo;
 struct sockaddr_in ser;
 int end=1;
 char buf[200];
+char mess[200];
 
 int main() {
     gniazdo = socket(AF_INET,SOCK_STREAM,0);
@@ -20,6 +21,7 @@ int main() {
 //    fgets(buf,sizeof(buf), stdin);
 
     status = connect(gniazdo, (struct sockaddr*)&ser, sizeof(ser));
+    printf("status: %d\n", status);
     if (status<0) {printf("blad connect\n"); return 0;}
 
 //    status = send(gniazdo, buf, strlen(buf),0);
@@ -31,15 +33,15 @@ int main() {
 
     while (end) {
         strcpy(buf, "");
+        strcpy(mess, "");
         printf("Podaj tekst:\n");
-        printf("buf: %s\n", buf);
-        fgets(buf,sizeof(buf), stdin);
-        printf("buf: %s\n", buf);
-        status = send(gniazdo, buf, strlen(buf),0);
-        if (buf[0]=='P' || buf[0]=='Q') end=0;
+        fgets(mess,sizeof(mess), stdin);
+        //printf("mess: %s\n koniec mess", mess);
+        status = send(gniazdo, mess, strlen(mess),0);
         fflush(stdout);
+        if (mess[0]=='P' || mess[0]=='Q') end=0;
         status = recv(gniazdo, buf, sizeof(buf)-1,0);
-        fflush(stdout);
+        //fflush(stdout);
         buf[status]='\0';
         printf("Otrzymałem: %s\n",buf);
     }
