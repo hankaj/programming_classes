@@ -390,7 +390,7 @@ int main() {
     struct sockaddr_in ser, cli;
     char buf[1000];
     char mess[1000];
-    int x1, y1, kierunkek, odleglosc, z_x, z_y, do_x, do_y;
+    int x1, y1, kierunkek, odleglosc, z_x, z_y, do_x, do_y,w;
     int *k = &kierunkek;
     int *o = &odleglosc;
     int *x = &x1;
@@ -441,14 +441,24 @@ int main() {
                 status=send(gniazdo2,mess,strlen(mess),0);
                 fflush(stdout);
 
-                status=recv(gniazdo2,buf,sizeof(buf)-1,0);
-                buf[status]='\0';
-                printf("Otrzymałem: %s\n",buf);
-                sscanf(buf, "%d %d %d %d", &z_x, &z_y, &do_x, &do_y);
+                while (1) {
+                    memset(buf,0,strlen(buf));
+                    memset(mess,0,strlen(mess));
+                    status=recv(gniazdo2,buf,sizeof(buf)-1,0);
+                    buf[status]='\0';
+                    printf("Otrzymałem: %s\n",buf);
+                    if (buf[0]=='Q') {sprintf(mess, "Zgoda, serwer konczy prace\n"); end=0; end_conv=0; gra=0; break;}
+                    if (buf[0]=='P') {sprintf(mess, "Kończę rozmowę\n"); end_conv=0; gra=0; break;}
+                    w=sscanf(buf, "%d %d %d %d", &z_x, &z_y, &do_x, &do_y);
+                    if (w==4 && czy_mozna_tak_postawic(pl, z_x, z_y, do_x, do_y)) break;
+                    sprintf(mess, "Nie możesz tak postawić\n");
+                    status=send(gniazdo2,mess,strlen(mess),0);
+                    fflush(stdout);
+                }
+
                 przesun_figure_gracza(pl, z_x, z_y, do_x, do_y);
                 if (ocena_z_heurystykami(pl)*2<PRZEGRANA) {sprintf(mess,"Wygrałeś.\n");gra=0; break;}
                 if (ocena_z_heurystykami(pl)*2>WYGRANA) {sprintf(mess,"Komputer wygrał.\n");gra=0; break;}
-
             }
 
             status=send(gniazdo2,mess,strlen(mess),0);
@@ -459,4 +469,3 @@ int main() {
 
     close(gniazdo);
 }
-
