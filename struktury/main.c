@@ -24,6 +24,11 @@ void wypisz(struct el_listy *pocz){
     while (pocz) {printf("%lf\n",pocz->w); pocz=pocz->nast;}
 }
 
+void wypisz_z_separatorem(struct el_listy *pocz, char separator){
+    if (pocz) {printf("%lf", pocz->w); pocz=pocz->nast;}
+    while (pocz) {printf("%c%lf", separator, pocz->w); pocz=pocz->nast;}
+}
+
 
 void wstaw(struct  el_listy **pocz, double war){
     struct el_listy *nowy, *ww=*pocz;
@@ -56,12 +61,82 @@ void usun(struct el_listy **pocz, double war){
 }
 
 
+int warunek(double war){
+    if (war==10) return 1;
+    return 0;
+}
+
+void usun_spelniajacy_warunek(struct el_listy **pocz, int (*funkcja_z_warunkiem)(double war)){
+    struct el_listy *pom, *ww=*pocz;
+    if (ww==0) return; // pusta lista, nie da się nic usunać
+    if ((*funkcja_z_warunkiem)(ww->w)) {*pocz=ww->nast; free(ww);}
+    else{
+        while (ww->nast!=0 && (*funkcja_z_warunkiem)(ww->nast->w)==0) ww = ww->nast;
+        if (ww->nast!=0 && (*funkcja_z_warunkiem)(ww->nast->w)){
+            pom=ww->nast; // potrzebujemy pom, żeby wiedzieć potem które miejsce zwolnić
+            ww->nast = ww->nast->nast;
+            free(pom);
+        }
+    }
+}
+
+
+void usun_duplikaty(struct el_listy *pocz){
+    double pierwsze_wystapienie;
+    struct el_listy *pom, *ww=pocz, *ww2;
+    if (ww==0) return;
+    while (ww){
+        pierwsze_wystapienie=ww->w;
+        ww2=ww;
+        while (ww2->nast!=0 && pierwsze_wystapienie != ww2->nast->w) ww2=ww2->nast;
+        if (ww2->nast!=0 && pierwsze_wystapienie==ww2->nast->w){
+            pom=ww2->nast;
+            ww2->nast=ww->nast->nast;
+            free(pom);
+        }
+        ww=ww->nast;
+    }
+}
+
+
+void sortuj_liste(struct el_listy *pocz){
+    struct el_listy *ws=pocz, *ws1, *ws2;
+    double pom;
+    while (ws){
+        ws1=pocz;
+        ws2=pocz->nast;
+        while (ws2) {
+            if (ws1->w > ws2->w) {
+                pom=ws1->w;
+                ws1->w=ws2->w;
+                ws2->w=pom;
+            }
+            ws1=ws1->nast;
+            ws2=ws2->nast;
+        }
+        ws=ws->nast;
+    }
+}
+
+void dodaj_1(double *war){
+    *war = (*war) + 1;
+}
+
+
+void wywolaj_funkcje_na_liscie(struct el_listy *pocz, void (*funkcja)(double *war)){
+    while (pocz){
+        (*funkcja)(&(pocz->w));
+        pocz=pocz->nast;
+    }
+}
+
+
 struct el_listy *znajdz(struct  el_listy *pocz, double war){
+    // jeśli lista pusta, zwraca 0
+    // jeśli war jest w liście to while zatrzyma się na elemencie pocz->w=war i zwróci ten element
+    // jeśli war nie ma liście to dojdzie do końca (pocz=0) i zwróci 0
     while (pocz && pocz->w != war /* && pocz->nast*/) pocz=pocz->nast;
     return pocz;
-    //if (pocz==0) return 0;
-//    if (pocz==0 || pocz->w==war) return pocz;
-//    return 0;
 }
 
 
@@ -86,6 +161,7 @@ struct el_listy *kopiuj_liste(struct  el_listy *pocz){
     if (lista2) nowy->nast=0;
     return lista2;
 }
+
 
 struct el_listy *dodaj_listy(struct el_listy *pocz1, struct el_listy *pocz2){
     struct el_listy *kop1, *kop2, *pom;
@@ -117,8 +193,27 @@ int main() {
     ws->w=2;
     ws->nast=0;
     printf("dopisz:\n");
-    dopisz(&ws, 5);
+    dopisz(&ws, 2);
     dopisz(&ws,10);
+    dopisz(&ws, 10);
+    dopisz(&ws, 5);
+
+    wypisz(ws);
+    wypisz_z_separatorem(ws, ',');
+
+    // czy działa usuń duplikaty
+    printf("\nusuń duplikaty:\n");
+    usun_duplikaty(ws);
+    wypisz(ws);
+
+    // czy działa sortuj
+    printf("\nsortuj:\n");
+    sortuj_liste(ws);
+    wypisz(ws);
+
+    // czy działa wywolaj funkcje na liscie
+    printf("\nwywołaj funkcje na liscie:\n");
+    wywolaj_funkcje_na_liscie(ws, dodaj_1);
     wypisz(ws);
 
     // czy działa wstaw
@@ -127,8 +222,13 @@ int main() {
     wypisz(ws);
 
     // czy działa usuń
-    printf("\nusuń:\n");
-    usun(&ws, 10);
+//    printf("\nusuń:\n");
+//    usun(&ws, 10);
+//    wypisz(ws);
+
+    // czy działa usuń z warunkiem
+    printf("\nusuń z warunkiem:\n");
+    usun_spelniajacy_warunek(&ws, warunek);
     wypisz(ws);
 
     // czy działa znajdź
@@ -138,7 +238,7 @@ int main() {
     wypisz(ws);
 
     // czy działa kopiuj
-    printf("\nkopiuj:\n");
+    printf("\nkopiuj i wstaw:\n");
     w2=kopiuj_liste(ws);
     wstaw(&w2, 7);
     wypisz(w2);
