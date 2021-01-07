@@ -5,6 +5,8 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image/stb_image.h"
 #define ROZ_X 100
 #define ROZ_Y 100
 #include <time.h>
@@ -55,22 +57,24 @@ void rysuj_powierzchnie(void){
     glTranslatef(PX,PY,PZ);
     glClearColor(1,1,1,1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
     glColor3f(0,0,0);
+    glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
     for (int x=0; x<ROZ_X-1; x++){
         for (int y=0; y<ROZ_Y-1; y++){
-            glVertex3f(x, powierz[x][y], y);
-            glVertex3f(x, powierz[x][y+1], y+1);
-            glVertex3f(x+1, powierz[x+1][y+1], y+1);
-            glVertex3f(x+1, powierz[x+1][y], y);
+            glTexCoord2f(0,0);glVertex3f(x, powierz[x][y], y);
+            glTexCoord2f(0,1);glVertex3f(x, powierz[x][y+1], y+1);
+            glTexCoord2f(1,1);glVertex3f(x+1, powierz[x+1][y+1], y+1);
+            glTexCoord2f(1,0);glVertex3f(x+1, powierz[x+1][y], y);
         }
     }
     glEnd();
-
+    //glBindTexture(GL_TEXTURE_2D, 0);
     glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 
-
+    glDisable(GL_TEXTURE_2D);
     // tworzy kostki
     glBegin(GL_QUADS);
     for (int i = 0; i < 6; i++) {
@@ -116,6 +120,57 @@ void rysuj_powierzchnie(void){
     glutSwapBuffers();
 }
 
+void rysuj_obiekty(){
+    glLoadIdentity();
+    glRotatef(-KAT,0,1,0);
+    glTranslatef(PX,PY,PZ);
+    glClearColor(1,1,1,1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+    // tworzy kostki
+    glBegin(GL_QUADS);
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 4; j++) {
+            //glColor3fv((GLfloat*)&vertexColors[faces[i][j]]);
+            glColor3f(0.6, 1.0, 0.0); glVertex3iv((GLint*)&vertices[faces[i][j]]);
+        }
+    }
+    glEnd();
+    glBegin(GL_QUADS);
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 4; j++) {
+            //glColor3fv((GLfloat*)&vertexColors[faces[i][j]]);
+            glColor3f(0.4, 1.0, 1.0); glVertex3iv((GLint*)&vertices2[faces[i][j]]);
+        }
+    }
+    glEnd();
+
+    glBegin(GL_QUADS);
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 4; j++) {
+            //glColor3fv((GLfloat*)&vertexColors[faces[i][j]]);
+            glColor3f(0.96, 0.59, 0.86); glVertex3iv((GLint*)&vertices3[faces[i][j]]);
+        }
+    }
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // tworzy czworościany
+    for (int p=10; p<ROZ_X-1; p+=ROZ_X/10){
+        glBegin(GL_TRIANGLE_STRIP);
+        glColor3f(1, 1, 1); glVertex3f(p, powierz[p][p]+2, p);
+        glColor3f(1, 0, 0); glVertex3f(-1+p, powierz[-1+p][1+p], 1+p);
+        glColor3f(0, 1, 0); glVertex3f(1+p, powierz[1+p][1+p], 1+p);
+        glColor3f(0, 0, 1); glVertex3f(p, powierz[p][-1+p], -1.4+p);
+        glColor3f(1, 1, 1); glVertex3f(p, powierz[p][p]+2, p);
+        glColor3f(1, 0, 0); glVertex3f(-1+p, powierz[-1+p][1+p], 1+p);
+        glEnd();
+    }
+    glFlush();
+    glutSwapBuffers();
+}
 
 
 
@@ -173,6 +228,43 @@ void inicjuj_plansze(int liczba_gor, int max_promien, int max_wys){
 }
 
 
+void inicjuj_teksture(char nazwa[]){
+//    unsigned char buf[256*256*3];
+//    long i;
+//    FILE *plik;
+//    if ((plik=fopen(nazwa,"rb"))==NULL) {printf("blad otwarcia\n"); return;}
+//    fseek(plik, -256*256*3, SEEK_END);
+//    for (i=0; i<256*256*3;i+=3) {buf[i+2]=getc(plik);buf[i+1]=getc(plik);buf[i]=getc(plik);}
+//    fclose(plik);
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    //glBindTexture(GL_TEXTURE_2D, texture);
+// set the texture wrapping/filtering options (on the currently bound texture object)
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+// load and generate the texture
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("sand.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        printf("Failed to load texture");
+    }
+    stbi_image_free(data);
+
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
+    //glEnable(GL_TEXTURE_2D);
+}
+
+
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
@@ -182,6 +274,7 @@ int main(int argc, char** argv) {
     glutCreateWindow("title");
     glutSpecialFunc(special);
     inicjuj();
+    inicjuj_teksture("fine-sand.bmp");
     inicjuj_plansze(100,30,3);
 
     glutDisplayFunc(rysuj_powierzchnie);
