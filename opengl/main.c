@@ -229,22 +229,9 @@ void inicjuj_plansze(int liczba_gor, int max_promien, int max_wys){
 
 
 void inicjuj_teksture(char nazwa[]){
-//    unsigned char buf[256*256*3];
-//    long i;
-//    FILE *plik;
-//    if ((plik=fopen(nazwa,"rb"))==NULL) {printf("blad otwarcia\n"); return;}
-//    fseek(plik, -256*256*3, SEEK_END);
-//    for (i=0; i<256*256*3;i+=3) {buf[i+2]=getc(plik);buf[i+1]=getc(plik);buf[i]=getc(plik);}
-//    fclose(plik);
     unsigned int texture;
     glGenTextures(1, &texture);
-    //glBindTexture(GL_TEXTURE_2D, texture);
-// set the texture wrapping/filtering options (on the currently bound texture object)
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-// load and generate the texture
+
     int width, height, nrChannels;
     unsigned char *data = stbi_load("sand.jpg", &width, &height, &nrChannels, 0);
     if (data)
@@ -261,7 +248,6 @@ void inicjuj_teksture(char nazwa[]){
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
-    //glEnable(GL_TEXTURE_2D);
 }
 
 
@@ -271,7 +257,7 @@ int main(int argc, char** argv) {
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowPosition(80, 80);
     glutInitWindowSize(400, 400);
-    glutCreateWindow("title");
+    glutCreateWindow("Desert");
     glutSpecialFunc(special);
     inicjuj();
     inicjuj_teksture("fine-sand.bmp");
