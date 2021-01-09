@@ -77,13 +77,94 @@ void sort3(const char* arr[], int size){
 }
 
 
+struct Wynik{
+    char nazwisko[50];
+    int glosy;
+};
+
+
+void increase(void *num){
+    (*(int *)num)++;
+}
+
+
+void wiarolomnySystemDemokratyczny(struct Wynik wyniki[], int len){
+    int i;
+    for (i=0; i<len; i++){
+        if (strcmp(wyniki[i].nazwisko,"Nowak")==0){
+            wyniki[i].glosy-=10;
+        }
+        printf("%s %d\n", wyniki[i].nazwisko, wyniki[i].glosy);
+    }
+}
+
+
+int vote_comparator(const void * p1, const void * p2){
+    int num_votes1 = (*(struct Wynik*)p1).glosy;
+    int num_votes2 = (*(struct Wynik*)p2).glosy;
+    return num_votes1 - num_votes2;
+}
+
+
+void sortujWynikiWyborcze(struct Wynik wyniki[], int size){
+    qsort(wyniki, size, sizeof(struct Wynik), vote_comparator);
+}
+
+
+struct employee{
+    char *name;
+    char *surname;
+    int age;
+};
+
+
+struct employee *findEmployee(struct employee employees[], int len, char *surname){
+    int i=0;
+    while (i < len){
+        if (strcmp(employees[i].surname, surname)==0) return &employees[i];
+        i++;
+    }
+    return NULL;
+}
+
+
+enum plec {KOBIETA, MEZCZYZNA};
+
+
+struct osoba{
+    enum plec plec_osoby;
+    char *imie;
+};
+
+
+void losujObiadSmoka(struct osoba osoby[], int len){
+    int i;
+    while (len){
+        enum plec wylosowa_plec = rand()%2;
+        for (i=0; i<len; i++){
+            if (osoby[i].plec_osoby==wylosowa_plec){
+                printf("Imię osoby zjedzonej przez smoka: %s\n", osoby[i].imie);
+                osoby[i].plec_osoby=osoby[len-1].plec_osoby;
+                osoby[i].imie = osoby[len-1].imie;
+                len--;
+                break;
+            }
+        }
+    }
+}
+
 
 int main() {
-    const char* arr[] = {"hani","duap","hcar","lody","kisi"};
-    int i;
-
-    sort3(arr, 5);
-
-    for (i=0; i<5; i++) printf("%s ", arr[i]);
+    struct osoba osoba1, osoba2, osoba3, osoba4;
+    osoba1.plec_osoby=KOBIETA;
+    osoba1.imie="Hania";
+    osoba2.plec_osoby=KOBIETA;
+    osoba2.imie="Monika";
+    osoba3.plec_osoby=MEZCZYZNA;
+    osoba3.imie="Marcin";
+    osoba4.plec_osoby=MEZCZYZNA;
+    osoba4.imie="Michał";
+    struct osoba osoby[] = {osoba1, osoba2, osoba3, osoba4};
+    losujObiadSmoka(osoby, sizeof(osoby)/sizeof(struct osoba));
     return 0;
 }
