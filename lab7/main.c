@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define LOG(text) printf("%s %d %s\n", __FILE__, __LINE__, text)
 
 int **dynamicArray(int i, int j){
     int **array, a;
@@ -82,7 +83,7 @@ char **split(char *text){
 
 
 char *unsplit(char **array){
-    char text[50] = "";
+    static char text[50] = "";
     while (*array){
         strcat(text, *array);
         strcat(text, " ");
@@ -116,6 +117,86 @@ void print3times(void (*function1)(char *), void (*function2)(char *), void (*fu
 }
 
 
+int cmpfunc(const void *a, const void *b){
+    return (*(int *)a - *(int *)b);
+}
+
+
+struct fraction{
+    int numerator;
+    int denominator;
+};
+
+
+struct fraction add(struct fraction fraction1, struct fraction fraction2){
+    struct fraction result;
+    result.numerator = fraction1.numerator*fraction2.denominator + fraction2.numerator*fraction1.denominator;
+    result.denominator = fraction1.denominator * fraction2.denominator;
+    return result;
+}
+
+
+struct fraction mulitiply(struct fraction fraction1, struct fraction fraction2){
+    struct fraction result;
+    result.numerator = fraction1.numerator * fraction2.numerator;
+    result.denominator = fraction1.denominator * fraction2.denominator;
+    return result;
+}
+
+
+struct Array{
+    int dim;
+    int *elements;
+};
+
+
+struct Array construct(int size){
+    struct Array arr;
+    arr.dim = size;
+    arr.elements = malloc(sizeof(int) * size);
+    return arr;
+}
+
+
+
 int main() {
     print3times(print1, print2, print3, "siemaneczko");
+    int i=system("ls -l");
+    printf("%d\n", i);
+
+    FILE *fp;
+    char path[1035];
+    fp = popen("pwd", "r");
+    if (fp==NULL){
+        printf("Failed to run command\n");
+        exit(1);
+    }
+    while (fgets(path, sizeof(path), fp) != NULL) printf("%s", path);
+    pclose(fp);
+
+    int *item;
+    int key=32;
+    int values[] = {5, 20, 29, 32, 63};
+    item = (int *) bsearch(&key, values, 5, sizeof(int), cmpfunc);
+    if (item != NULL) printf("Found item = %d\n", *item);
+    else printf("Item = %d could not be found", key);
+
+    printf("Compilation date: %s\n", __DATE__);
+    printf("Compilation time: %s\n", __TIME__);
+    printf("Current function: %s\n", __FUNCTION__);
+    printf("Compilation time: %s\n", __TIME__);
+    printf("File name: %s\n", __FILE__);
+    printf("Current line: %d\n", __LINE__);
+
+    LOG("hej");
+
+    struct fraction a, b, c, d;
+    a.numerator=1;
+    a.denominator=2;
+    b.numerator=1;
+    b.denominator=3;
+    c = add(a, b);
+    d = mulitiply(a, b);
+    printf("%d/%d\n", c.numerator, c.denominator);
+    printf("%d/%d\n", d.numerator, d.denominator);
 }
