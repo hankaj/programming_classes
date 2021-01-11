@@ -28,9 +28,6 @@ GLint faces[6][4] = {
         {1, 5, 7, 3}, {5, 4, 6, 7}, {4, 0, 2, 6},
         {3, 7, 6, 2}, {0, 1, 3, 2}, {0, 4, 5, 1}};
 
-GLfloat vertexColors[8][3] = {
-        {0.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, {0.0, 1.0, 0.0}, {0.0, 1.0, 1.0},
-        {1.0, 0.0, 0.0}, {1.0, 0.0, 1.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 1.0}};
 
 
 GLfloat KAT=0, PI=3.14, PX=-ROZ_X/2, PY=-2, PZ=-ROZ_Y/2;
@@ -43,8 +40,9 @@ double min(double num1, double num2)
 
 void inicjuj(void){
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(45,1,1,100);
+    glLoadIdentity(); // macierz jednostkowa
+    gluPerspective(45,1,1,100); //ustawia perspektywę, po kolei kąt, szerokość/wysokość ekranu, odległość obserwatora od obrazu i  punktu od obrazu
+    glEnable(GL_DEPTH_TEST); // obiekty w tyle są rysowane za obiektami z przodu
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glEnable(GL_DEPTH_TEST);
@@ -53,14 +51,13 @@ void inicjuj(void){
 
 void rysuj_powierzchnie(void){
     glLoadIdentity();
-    glRotatef(-KAT,0,1,0);
-    glTranslatef(PX,PY,PZ);
-    glClearColor(1,1,1,1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-    glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+    glRotatef(-KAT,0,1,0); // obrót o kąt względem y
+    glTranslatef(PX,PY,PZ); // przesunięcie o px py pz
+    glClearColor(1,1,1,1); // czyszczenie sceny
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // wyzerowanie bufora koloru i głębokości
+    glPolygonMode(GL_FRONT_AND_BACK,GL_FILL); // wyświetla przód i tył obiektu, powierzchnia wypełniona
     glColor3f(0,0,0);
-    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_2D); //
     glBegin(GL_QUADS);
     for (int x=0; x<ROZ_X-1; x++){
         for (int y=0; y<ROZ_Y-1; y++){
@@ -117,63 +114,13 @@ void rysuj_powierzchnie(void){
 
 
     glFlush();
-    glutSwapBuffers();
-}
-
-void rysuj_obiekty(){
-    glLoadIdentity();
-    glRotatef(-KAT,0,1,0);
-    glTranslatef(PX,PY,PZ);
-    glClearColor(1,1,1,1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-    glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-    // tworzy kostki
-    glBegin(GL_QUADS);
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 4; j++) {
-            //glColor3fv((GLfloat*)&vertexColors[faces[i][j]]);
-            glColor3f(0.6, 1.0, 0.0); glVertex3iv((GLint*)&vertices[faces[i][j]]);
-        }
-    }
-    glEnd();
-    glBegin(GL_QUADS);
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 4; j++) {
-            //glColor3fv((GLfloat*)&vertexColors[faces[i][j]]);
-            glColor3f(0.4, 1.0, 1.0); glVertex3iv((GLint*)&vertices2[faces[i][j]]);
-        }
-    }
-    glEnd();
-
-    glBegin(GL_QUADS);
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 4; j++) {
-            //glColor3fv((GLfloat*)&vertexColors[faces[i][j]]);
-            glColor3f(0.96, 0.59, 0.86); glVertex3iv((GLint*)&vertices3[faces[i][j]]);
-        }
-    }
-    glEnd();
-    glDisable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // tworzy czworościany
-    for (int p=10; p<ROZ_X-1; p+=ROZ_X/10){
-        glBegin(GL_TRIANGLE_STRIP);
-        glColor3f(1, 1, 1); glVertex3f(p, powierz[p][p]+2, p);
-        glColor3f(1, 0, 0); glVertex3f(-1+p, powierz[-1+p][1+p], 1+p);
-        glColor3f(0, 1, 0); glVertex3f(1+p, powierz[1+p][1+p], 1+p);
-        glColor3f(0, 0, 1); glVertex3f(p, powierz[p][-1+p], -1.4+p);
-        glColor3f(1, 1, 1); glVertex3f(p, powierz[p][p]+2, p);
-        glColor3f(1, 0, 0); glVertex3f(-1+p, powierz[-1+p][1+p], 1+p);
-        glEnd();
-    }
-    glFlush();
-    glutSwapBuffers();
+    glutSwapBuffers(); // przełączenie buforów, ten w którym było rysowane staje się widoczny
 }
 
 
 
+
+// poruszanie się
 void special(int key, int a, int b) {
     switch (key) {
         case GLUT_KEY_LEFT: KAT+=4; if (KAT>360) KAT-=360; break;
@@ -181,7 +128,7 @@ void special(int key, int a, int b) {
         case GLUT_KEY_UP: PX += sin(PI*KAT/180); PZ += cos(PI*KAT/180); PY = -powierz[(int)-PX][(int)-PZ]-2; break;
         case GLUT_KEY_DOWN: PX -= sin(PI*KAT/180); PZ -= cos(PI*KAT/180); PY = -powierz[(int)-PX][(int)-PZ]-2; break;
     }
-    glutPostRedisplay();
+    glutPostRedisplay(); // odśwież wyświetlanie
 }
 
 
@@ -258,7 +205,7 @@ int main(int argc, char** argv) {
     glutInitWindowPosition(80, 80);
     glutInitWindowSize(400, 400);
     glutCreateWindow("Desert");
-    glutSpecialFunc(special);
+    glutSpecialFunc(special); // tutaj ma byc special
     inicjuj();
     inicjuj_teksture("fine-sand.bmp");
     inicjuj_plansze(100,30,3);
